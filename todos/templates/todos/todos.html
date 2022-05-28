@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="header-bar">
+    <div>
+        <h1>Hello, {{request.user|title}}</h1>
+        <h3 style="margin:0">You have <i>{{count}}</i> open todo{{ count|pluralize:"s" }}</h3>
+    </div>
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+</div>
+<div id="search-add-wrapper">
+    <a href="{% url 'todo-create' %}"><input class="button" type="button" value="+ Add" /></a>
+    <form method="GET" style="margin-top: 10px; display:flex;">
+        <input type="text" name="search-area" value="{{search_input}}" />
+        <input class="button" type="submit" value="Search" />
+    </form>
+</div>
+<div class="todo-items-wrapper">
+    {% for todo in todos %}
+    <div class="todo-wrapper">
+        {% if todo.status == 'done' %}
+        <div class="todo-title">
+            <div class="todo-done-icon" title="Done"></div>
+            <i><s><a href="{% url 'todo-update' todo.id %}">{{todo}}</a></s></i>
+        </div>
+        {% elif todo.status == 'working' %}
+        <div class="todo-title">
+            <div class="todo-working-icon" title="Working"></div>
+            <a href="{% url 'todo-update' todo.id %}">{{todo}}</a>
+        </div>
+        {% elif todo.status == 'overdue' %}
+        <div class="todo-title">
+            <div class="todo-overdue-icon" title="Overdue"></div>
+            <a href="{% url 'todo-update' todo.id %}">{{todo}}</a>
+        </div>
+        {% else %}
+        <div class="todo-title">
+            <div class="todo-open-icon" title="Open"></div>
+            <a href="{% url 'todo-update' todo.id %}">{{todo}}</a>
+        </div>
+        {% endif %}
+        <a class="delete-link" href="{% url 'todo-delete' todo.id %}">&#215;</a>
+    </div>
+    {% empty %}
+    <h3>No tasks in lists</h3>
+    {% endfor %}
+</div>
+
+{% endblock content %}
