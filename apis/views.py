@@ -1,10 +1,11 @@
 from cmath import exp
+from http.client import NOT_FOUND
 from django.shortcuts import render
 from rest_framework import generics
 from todos import models
-from .serializers import TodoSerializer
+from .serializers import TodoSerializer, TagSerializer
 from rest_framework import filters
-
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -32,11 +33,32 @@ class UserFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(user=request.user)
 
 
+class ListTag(generics.ListCreateAPIView):
+    serializer_class = TagSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = models.Tag.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+
+class DetailTag(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TagSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = models.Tag.objects.all()
+
+    # Validate the todos are created by login user only
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+
 class ListTodo(generics.ListCreateAPIView):
+    serializer_class = TodoSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = models.Todo.objects.all()
-    serializer_class = TodoSerializer
     filter_backends = [UserFilterBackend]
 
     # Validate the todos are created by login user only
@@ -45,10 +67,10 @@ class ListTodo(generics.ListCreateAPIView):
 
 
 class DetailTodo(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TodoSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = models.Todo.objects.all()
-    serializer_class = TodoSerializer
     filter_backends = [UserFilterBackend]
 
     # Validate the todos are created by login user only

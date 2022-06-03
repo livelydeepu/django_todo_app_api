@@ -75,7 +75,7 @@ class TodoDetail(LoginRequiredMixin, DetailView):
 # By default it calls template todo_form.html
 class TodoCreate(LoginRequiredMixin, CreateView):
     model = Todo
-    fields = ['title', 'description', 'due_date', 'tag', 'status']
+    fields = ['title', 'description', 'due_date', 'tags', 'status']
     success_url = reverse_lazy('todos')
 
     # Validate the todos are created by login user only
@@ -87,7 +87,7 @@ class TodoCreate(LoginRequiredMixin, CreateView):
 # By default it calls template todo_form.html
 class TodoUpdate(LoginRequiredMixin, UpdateView):
     model = Todo
-    fields = ['title', 'description', 'due_date', 'tag', 'status']
+    fields = ['title', 'description', 'due_date', 'tags', 'status']
     success_url = reverse_lazy('todos')
 
 
